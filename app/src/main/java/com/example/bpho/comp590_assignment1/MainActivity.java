@@ -78,8 +78,17 @@ public class MainActivity extends AppCompatActivity {
             String letterId = "let"+switchLetters[i];
             int resID2 = getResources().getIdentifier(letterId, "drawable", getPackageName());
             btn.setBackgroundResource(resID2);
+            if (switches[i] == true) {
+                indexSwitch(i);
+            }
             switches[i] = false;
         }
+    }
+
+
+    public void resetButton(View view) {
+        restartSwitches();
+        // TODO:
     }
 
     /**
@@ -210,41 +219,45 @@ public class MainActivity extends AppCompatActivity {
         solutionSet = switchList;
         randomSwitches = true;
         for (int randSwitch : switchList) {
-            switch (randSwitch) {
-                case 0:
-                    switchA();
-                    break;
-                case 1:
-                    switchB();
-                    break;
-                case 2:
-                    switchC();
-                    break;
-                case 3:
-                    switchD();
-                    break;
-                case 4:
-                    switchE();
-                    break;
-                case 5:
-                    switchF();
-                    break;
-                case 6:
-                    switchG();
-                    break;
-                case 7:
-                    switchH();
-                    break;
-                case 8:
-                    switchI();
-                    break;
-                case 9:
-                    switchJ();
-                    break;
-            }
+            indexSwitch(randSwitch);
         }
         randomSwitches = false;
         storeSolution();
+    }
+
+    public void indexSwitch(int i) {
+        switch (i) {
+            case 0:
+                switchA();
+                break;
+            case 1:
+                switchB();
+                break;
+            case 2:
+                switchC();
+                break;
+            case 3:
+                switchD();
+                break;
+            case 4:
+                switchE();
+                break;
+            case 5:
+                switchF();
+                break;
+            case 6:
+                switchG();
+                break;
+            case 7:
+                switchH();
+                break;
+            case 8:
+                switchI();
+                break;
+            case 9:
+                switchJ();
+                break;
+        }
     }
 
     // Stores occurrences into a map, adds the switch letter as Uppercase character
@@ -567,4 +580,5 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
 }
