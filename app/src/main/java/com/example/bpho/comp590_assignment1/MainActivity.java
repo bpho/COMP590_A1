@@ -11,8 +11,10 @@ import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import org.w3c.dom.Text;
 
@@ -36,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean autoPressed;
     public boolean blackButtons;
     public boolean randomSwitches;
+    public boolean editOn;
     public int moveCount = 0;
 
     @Override
@@ -44,6 +47,74 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         startGrid();
         randomSwitches();
+    }
+
+
+    public void editButton(View view) {
+        if (editOn == false) {
+            editOn = true;
+        } else {
+            editOn = false;
+        }
+    }
+
+    // TODO: Auto button needs to check the current layout of the grid, then test all possible combos
+    // TODO: If there is a solution, add it to finalSolution HashSet, then printing out sequence and movecount stays the same
+    // TODO: Test all string combinations, if it sets the boolean array to all true/false then solution is found, store in HasSet
+
+    public void gridEdit(View view) {
+        if (editOn == true) {
+            switch(view.getId()) {
+                case R.id.button0:
+                    changeNumber(0);
+                    break;
+                case R.id.button1:
+                    changeNumber(1);
+                    break;
+                case R.id.button2:
+                    changeNumber(2);
+                    break;
+                case R.id.button3:
+                    changeNumber(3);
+                    break;
+                case R.id.button4:
+                    changeNumber(4);
+                    break;
+                case R.id.button5:
+                    changeNumber(5);
+                    break;
+                case R.id.button6:
+                    changeNumber(6);
+                    break;
+                case R.id.button7:
+                    changeNumber(7);
+                    break;
+                case R.id.button8:
+                    changeNumber(8);
+                    break;
+                case R.id.button9:
+                    changeNumber(9);
+                    break;
+                case R.id.button10:
+                    changeNumber(10);
+                    break;
+                case R.id.button11:
+                    changeNumber(11);
+                    break;
+                case R.id.button12:
+                    changeNumber(12);
+                    break;
+                case R.id.button13:
+                    changeNumber(13);
+                    break;
+                case R.id.button14:
+                    changeNumber(14);
+                    break;
+                case R.id.button15:
+                    changeNumber(15);
+                    break;
+            }
+        }
     }
 
     public void restartButton(View view) {
@@ -94,6 +165,11 @@ public class MainActivity extends AppCompatActivity {
      */
     public void autoFinish(View view) {
         autoPressed = true;
+
+        if (editOn == true) {
+            testCombinations(switchLetters, new StringBuffer(), 0);
+        }
+
         TextView sequenceCount = (TextView)findViewById(R.id.switchCount);
         sequenceCount.setText("Switches count: (SOLUTION: ");
         sequenceCount.append(Integer.toString(finalSolution.size()));
@@ -112,6 +188,85 @@ public class MainActivity extends AppCompatActivity {
         sequence.append(")");
 
 //        animateSolution();
+    }
+
+    public void testCombinations(char[] letters, StringBuffer outString, int index) {
+        boolean isSolvable = false;
+        for (int i = index; i < letters.length; i++)
+        {
+            outString.append(switchLetters[i]);
+            System.out.println(outString);  // Call method to try switch method call combinations instead
+            if (isSolvable == false) {
+                if (sequenceTest(outString)) {
+                    Log.v("Combination Test: ", "FOUND SOLUTION");
+                    break;
+                }
+            }
+            testCombinations(letters, outString, i + 1);
+            outString.deleteCharAt(outString.length() - 1);
+        }
+    }
+
+    public boolean sequenceTest(StringBuffer sb) {
+        String s = sb.toString();
+        char[] charArray = s.toCharArray();
+        for (char c : charArray) {
+            switch (c) {
+                case 'a':
+                    switchA();
+                    break;
+                case 'b':
+                    switchB();
+                    break;
+                case 'c':
+                    switchC();
+                    break;
+                case 'd':
+                    switchD();
+                    break;
+                case 'e':
+                    switchE();
+                    break;
+                case 'f':
+                    switchF();
+                    break;
+                case 'g':
+                    switchG();
+                    break;
+                case 'h':
+                    switchH();
+                    break;
+                case 'i':
+                    switchI();
+                    break;
+                case 'j':
+                    switchJ();
+                    break;
+                 }
+        }
+        if (allSameColor(buttons)) {
+            finalSolution.clear();
+            for (char c : charArray) {
+                finalSolution.add(Character.toUpperCase(c));
+                Log.v("Combination Test: ", "Added to finalSolution");
+            }
+            return true;
+        } else {
+            return false;
+        }
+        // TODO: check if board is either all white or all black
+        // TODO: if it is store in HashMap, (Take current char array[] store contents into a hashset)
+        // TODO: add return statement
+    }
+
+    public boolean allSameColor(boolean[] ca) {
+        boolean first = ca[0];
+        for (boolean element : ca) {
+            if (element != first) {
+                return false;
+            }
+        }
+        return true;
     }
 
     // TODO: Fix timer functionality, only being used for initial delay!
@@ -567,4 +722,5 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
 }
