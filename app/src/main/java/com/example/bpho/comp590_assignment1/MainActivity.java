@@ -33,9 +33,7 @@ public class MainActivity extends AppCompatActivity {
     public static final char[] switchLetters = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'};
     public ArrayList<Integer> solutionSet = new ArrayList<>();
     public Set<Character> finalSolution = new HashSet<>();
-    public boolean autoPressed;
-    public boolean blackButtons;
-    public boolean randomSwitches;
+    public boolean autoPressed, blackButtons, randomSwitches, resetSwitches;
     public int moveCount = 0;
 
     @Override
@@ -64,6 +62,15 @@ public class MainActivity extends AppCompatActivity {
         startGrid();
         randomSwitches();
         restartSwitches();
+
+        for (int i = 0; i < buttons.length; i++) {
+            Log.v("Values for button" +i, String.valueOf(buttons[i]));
+        }
+
+        for (int j = 0; j < switches.length; j++) {
+            Log.v("Values for switch " +j, String.valueOf(switches[j]));
+        }
+        // LOG what buttons were pressed and switches
     }
 
     /**
@@ -76,19 +83,24 @@ public class MainActivity extends AppCompatActivity {
             int resID = getResources().getIdentifier(switchId, "id", getPackageName());
             Button btn = (Button)findViewById(resID);
             String letterId = "let"+switchLetters[i];
+            //Sets switches back to original letter drawable
             int resID2 = getResources().getIdentifier(letterId, "drawable", getPackageName());
             btn.setBackgroundResource(resID2);
-            if (switches[i] == true) {
-                indexSwitch(i);
-            }
             switches[i] = false;
         }
     }
 
 
     public void resetButton(View view) {
+        resetSwitches = true;       // Avoids changing the switch PNG background twice in individual switch methods
+        for (int i = 0; i < switches.length; i++) {
+            if (switches[i] == true) {
+                indexSwitch(i);     // Just changes the numbers on the grid
+            }
+        }
         restartSwitches();
-        // TODO:
+        resetSwitches = false;
+        moveCount = 0;
     }
 
     /**
@@ -125,52 +137,56 @@ public class MainActivity extends AppCompatActivity {
 
     // TODO: Fix timer functionality, only being used for initial delay!
     // TODO: Add switch animation as well
-//    public void animateSolution() {
-//        final Handler handler = new Handler();
-//        for (Character letter : finalSolution) {
-//            new Timer().schedule(new MyTimerTask(letter) {
-//                @Override
-//                public void run() {
-//                    handler.post(new Runnable() {
-//                        public void run() {
-//                            switch (letter) {
-//                                case 'A':
-//                                    switchA();
-//                                    break;
-//                                case 'B':
-//                                    switchB();
-//                                    break;
-//                                case 'C':
-//                                    switchC();
-//                                    break;
-//                                case 'D':
-//                                    switchD();
-//                                    break;
-//                                case 'E':
-//                                    switchE();
-//                                    break;
-//                                case 'F':
-//                                    switchF();
-//                                    break;
-//                                case 'G':
-//                                    switchG();
-//                                    break;
-//                                case 'H':
-//                                    switchH();
-//                                    break;
-//                                case 'I':
-//                                    switchI();
-//                                    break;
-//                                case 'J':
-//                                    switchJ();
-//                                    break;
-//                            }
-//                        }
-//                    });
-//                }
-//            }, 1000);
-//        }
-//    }
+    // TODO: Check for winning Toast after it finishes.
+    // ERROR: Need to Restart twice in order for solution animation to work...
+    // Buttons that were automated were not fixed when restarted
+    public void animateSolution() {
+        final Handler handler = new Handler();
+        for (Character letter : finalSolution) {
+            new Timer().schedule(new MyTimerTask(letter) {
+                @Override
+                public void run() {
+                    handler.post(new Runnable() {
+                        public void run() {
+                            switch (letter) {
+                                case 'A':
+                                    switchA();
+                                    break;
+                                case 'B':
+                                    switchB();
+                                    break;
+                                case 'C':
+                                    switchC();
+                                    break;
+                                case 'D':
+                                    switchD();
+                                    break;
+                                case 'E':
+                                    switchE();
+                                    break;
+                                case 'F':
+                                    switchF();
+                                    break;
+                                case 'G':
+                                    switchG();
+                                    break;
+                                case 'H':
+                                    switchH();
+                                    break;
+                                case 'I':
+                                    switchI();
+                                    break;
+                                case 'J':
+                                    switchJ();
+                                    break;
+                            }
+                        }
+                    });
+                }
+            }, 1000);
+        }
+    }
+
 
     public void winningToast() {
         Context context = getApplicationContext();
@@ -315,10 +331,6 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    /**
-     *  Grid color changes along with switch animation
-     *  when they are clicked
-     */
     public void switchA(View view) {
         switchA();
         updateTextViews('A');
@@ -385,16 +397,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     *  Regular grid color changes without button animation
-     */
-
     public void switchA() {
         changeNumber(0);
         changeNumber(1);
         changeNumber(2);
 
-        if (randomSwitches == false) {
+        if (randomSwitches == false && resetSwitches == false) {
             Button btnA = (Button)findViewById(R.id.switchA);
             if (switches[0] == false) {
                 btnA.setBackgroundResource(R.drawable.letapressed);
@@ -412,7 +420,7 @@ public class MainActivity extends AppCompatActivity {
         changeNumber(9);
         changeNumber(11);
 
-        if (randomSwitches == false) {
+        if (randomSwitches == false && resetSwitches == false) {
             Button btnB = (Button)findViewById(R.id.switchB);
 
             if (switches[1] == false) {
@@ -431,7 +439,7 @@ public class MainActivity extends AppCompatActivity {
         changeNumber(14);
         changeNumber(15);
 
-        if (randomSwitches == false) {
+        if (randomSwitches == false && resetSwitches == false) {
             Button btnC = (Button)findViewById(R.id.switchC);
 
             if (switches[2] == false) {
@@ -451,7 +459,7 @@ public class MainActivity extends AppCompatActivity {
         changeNumber(6);
         changeNumber(7);
 
-        if (randomSwitches == false) {
+        if (randomSwitches == false && resetSwitches == false) {
             Button btnD = (Button)findViewById(R.id.switchD);
 
             if (switches[3] == false) {
@@ -471,7 +479,7 @@ public class MainActivity extends AppCompatActivity {
         changeNumber(10);
         changeNumber(12);
 
-        if (randomSwitches == false) {
+        if (randomSwitches == false && resetSwitches == false) {
             Button btnE = (Button)findViewById(R.id.switchE);
 
             if (switches[4] == false) {
@@ -490,7 +498,7 @@ public class MainActivity extends AppCompatActivity {
         changeNumber(14);
         changeNumber(15);
 
-        if (randomSwitches == false) {
+        if (randomSwitches == false && resetSwitches == false) {
             Button btnF = (Button)findViewById(R.id.switchF);
 
             if (switches[5] == false) {
@@ -508,7 +516,7 @@ public class MainActivity extends AppCompatActivity {
         changeNumber(14);
         changeNumber(15);
 
-        if (randomSwitches == false) {
+        if (randomSwitches == false && resetSwitches == false) {
             Button btnG = (Button)findViewById(R.id.switchG);
 
             if (switches[6] == false) {
@@ -528,7 +536,7 @@ public class MainActivity extends AppCompatActivity {
         changeNumber(14);
         changeNumber(15);
 
-        if (randomSwitches == false) {
+        if (randomSwitches == false && resetSwitches == false) {
             Button btnH = (Button)findViewById(R.id.switchH);
 
             if (switches[7] == false) {
@@ -548,7 +556,7 @@ public class MainActivity extends AppCompatActivity {
         changeNumber(4);
         changeNumber(5);
 
-        if (randomSwitches == false) {
+        if (randomSwitches == false && resetSwitches == false) {
             Button btnI = (Button)findViewById(R.id.switchI);
 
             if (switches[8] == false) {
@@ -568,7 +576,7 @@ public class MainActivity extends AppCompatActivity {
         changeNumber(9);
         changeNumber(13);
 
-        if (randomSwitches == false) {
+        if (randomSwitches == false && resetSwitches == false) {
             Button btnJ = (Button)findViewById(R.id.switchJ);
 
             if (switches[9] == false) {
