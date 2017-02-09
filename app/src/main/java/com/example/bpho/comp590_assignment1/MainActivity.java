@@ -25,6 +25,9 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
     public static final char[] switchLetters = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'};
     public ArrayList<Integer> solutionSet = new ArrayList<>();
     public Set<Character> finalSolution = new HashSet<>();
+    public ArrayList<Character> finalSolutionArray = new ArrayList<>();
+    public int finalSolutionCount = 0;
     public boolean autoPressed, blackButtons, randomSwitches, resetSwitches;
     public int moveCount = 0;
 
@@ -47,7 +52,9 @@ public class MainActivity extends AppCompatActivity {
     public void restartButton(View view) {
         // Empty final solution hashset
         finalSolution.clear();
+        finalSolutionArray.clear();
         moveCount = 0;
+        finalSolutionCount = 0;
         autoPressed = false;
 
         // Reset TextViews
@@ -62,15 +69,6 @@ public class MainActivity extends AppCompatActivity {
         startGrid();
         randomSwitches();
         restartSwitches();
-
-        for (int i = 0; i < buttons.length; i++) {
-            Log.v("Values for button" +i, String.valueOf(buttons[i]));
-        }
-
-        for (int j = 0; j < switches.length; j++) {
-            Log.v("Values for switch " +j, String.valueOf(switches[j]));
-        }
-        // LOG what buttons were pressed and switches
     }
 
     /**
@@ -90,8 +88,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     public void resetButton(View view) {
+        resetButton();
+    }
+
+    public void resetButton() {
         resetSwitches = true;       // Avoids changing the switch PNG background twice in individual switch methods
         for (int i = 0; i < switches.length; i++) {
             if (switches[i] == true) {
@@ -101,6 +102,8 @@ public class MainActivity extends AppCompatActivity {
         restartSwitches();
         resetSwitches = false;
         moveCount = 0;
+        finalSolutionCount = 0;
+        finalSolutionArray.clear();         // Clears solution array
     }
 
     /**
@@ -114,79 +117,95 @@ public class MainActivity extends AppCompatActivity {
      * USE: Map to store key values, REMOVE if Map already contains (aka to avoid evens)
      */
     public void autoFinish(View view) {
+        // Resets/Clears the grid to original layout first incase of other user input
+        resetButton();
         autoPressed = true;
-        TextView sequenceCount = (TextView)findViewById(R.id.switchCount);
-        sequenceCount.setText("Switches count: (SOLUTION: ");
-        sequenceCount.append(Integer.toString(finalSolution.size()));
-        sequenceCount.append(") ");
+        if (finalSolutionCount == 0) {
+            TextView sequenceCount = (TextView) findViewById(R.id.switchCount);
+            sequenceCount.setText("Switches count: (SOLUTION: ");
+            sequenceCount.append(Integer.toString(finalSolution.size()));
+            sequenceCount.append(") ");
 
 
-        TextView sequence = (TextView)findViewById(R.id.sequence);
-        sequence.setText("Sequence: (SOLUTION: ");
-        if (finalSolution.isEmpty()) {
-            sequence.append("NO SOLUTION");
-        } else {
-            for (Character letter : finalSolution) {
-                sequence.append(Character.toString(letter));
+            TextView sequence = (TextView) findViewById(R.id.sequence);
+            sequence.setText("Sequence: (SOLUTION: ");
+            if (finalSolution.isEmpty()) {
+                sequence.append("NO SOLUTION");
+            } else {
+                for (Character letter : finalSolution) {
+                    sequence.append(Character.toString(letter));
+                    finalSolutionArray.add(letter);
+                }
             }
-        }
-        sequence.append(")");
+            sequence.append(")");
 
-//        animateSolution();
+            animateSolution();
+        }
     }
 
-    // TODO: Fix timer functionality, only being used for initial delay!
-    // TODO: Add switch animation as well
-    // TODO: Check for winning Toast after it finishes.
-    // ERROR: Need to Restart twice in order for solution animation to work...
-    // Buttons that were automated were not fixed when restarted
+    public void delayedSwitch(char c) {
+        switch (c) {
+            case 'A':
+                switchA();
+                break;
+            case 'B':
+                switchB();
+                break;
+            case 'C':
+                switchC();
+                break;
+            case 'D':
+                switchD();
+                break;
+            case 'E':
+                switchE();
+                break;
+            case 'F':
+                switchF();
+                break;
+            case 'G':
+                switchG();
+                break;
+            case 'H':
+                switchH();
+                break;
+            case 'I':
+                switchI();
+                break;
+            case 'J':
+                switchJ();
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     *  Creates a TimerTask which calls the switches in order of the indexed finalSolutionArray every
+     *  1 second. Once it reaches end of array, TimerTask stops, run method stops executing and
+     *  animation is done.
+     */
     public void animateSolution() {
         final Handler handler = new Handler();
-        for (Character letter : finalSolution) {
-            new Timer().schedule(new MyTimerTask(letter) {
-                @Override
-                public void run() {
-                    handler.post(new Runnable() {
-                        public void run() {
-                            switch (letter) {
-                                case 'A':
-                                    switchA();
-                                    break;
-                                case 'B':
-                                    switchB();
-                                    break;
-                                case 'C':
-                                    switchC();
-                                    break;
-                                case 'D':
-                                    switchD();
-                                    break;
-                                case 'E':
-                                    switchE();
-                                    break;
-                                case 'F':
-                                    switchF();
-                                    break;
-                                case 'G':
-                                    switchG();
-                                    break;
-                                case 'H':
-                                    switchH();
-                                    break;
-                                case 'I':
-                                    switchI();
-                                    break;
-                                case 'J':
-                                    switchJ();
-                                    break;
-                            }
+        final Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            public void run() {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (finalSolutionCount != finalSolutionArray.size()) {
+                            delayedSwitch(finalSolutionArray.get(finalSolutionCount));
+                            finalSolutionCount++;
+                        } else {
+                            winningToast();
+                            timer.cancel();
                         }
-                    });
-                }
-            }, 1000);
-        }
-    }
+                    }
+                });
+            }
+        }, 1000, 1000);     // 1 second before it begins, 1 second per iteration
 
+    }
 
     public void winningToast() {
         Context context = getApplicationContext();
